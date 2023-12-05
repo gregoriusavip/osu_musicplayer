@@ -1,4 +1,6 @@
 from enum import Enum
 
 class Error(Enum):
-    PATH_ERROR = 1
+    SUCCESS = 1
+    PATH_ERROR = 2
+    SQL_ERROR = 3
