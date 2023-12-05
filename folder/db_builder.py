@@ -1,9 +1,13 @@
-from scanner import default_scanner
+from Error import Error
 import sqlite3
 
 def create_db():
-    if default_scanner():
+    try:
         db = sqlite3.connect("songs.sql")
+    except sqlite3.Error as e:
+        print('Sql error: %s' % (' '.join(e.args)))
+        print("Exception class is: ", e.__class__)
+        return Error.SQL_ERROR
     
     db_cur = db.cursor()
     db_cur.execute("DROP TABLE IF EXISTS SONGS")
@@ -18,3 +22,4 @@ def create_db():
     
     db_cur.execute(table)
     db_cur.close()
+    return Error.SUCCESS
