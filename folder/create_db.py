@@ -1,12 +1,18 @@
 from Error import Error
 import sqlite3
+import logging
 
 # function to create the database for storing beatmaps information
 def create_db():
+    message = ""
+    logging.info("Creating database...")
     try:
         db = sqlite3.connect("beatmaps.sql")
         db.execute("PRAGMA foreign_keys = 1")
         db_cur = db.cursor()
+
+        logging.info("Removing and creating new beatmaps table...")
+        message = "beatmaps table creation"
         db_cur.execute("DROP TABLE IF EXISTS beatmaps")
 
         """
@@ -20,7 +26,10 @@ def create_db():
                     HideSet BOOLEAN NOT NULL CHECK (HideSet IN (0,1))
                 ); """
         db_cur.execute(table)
+        logging.info("Successfully created beatmaps table")
 
+        logging.info("Removing and creating new beatmapInfo table...")
+        message = "beatmapInfo table creation"
         db_cur.execute("DROP TABLE IF EXISTS beatmapInfo")
         
         table = """ CREATE TABLE beatmapInfo (
@@ -38,12 +47,18 @@ def create_db():
                     HideSet REFERENCES beatmaps(HideSet),
                     FOREIGN KEY(beatmapID) REFERENCES beatmaps(beatmapID)); """
         db_cur.execute(table)
+        logging.info("Successfully created beatmapInfo table")
 
+        message = "closing database cursor"
         db_cur.close()
+        logging.info("Created database.")
         return Error.SUCCESS
     except sqlite3.Error as e:
-        print('Sql error: %s' % (' '.join(e.args)))
-        print("Exception class is: ", e.__class__)
+        sql_error_handler(e, message)
         return Error.SQL_ERROR
-
-create_db()
+    
+def sql_error_handler(e, message):
+    reason = "Task " + message + " could not be completed."
+    logging.critical(reason)
+    logging.error('Sql error: %s' % (' '.join(e.args)))
+    logging.error("Exception class is: ", e.__class__)
