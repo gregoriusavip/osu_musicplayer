@@ -1,7 +1,7 @@
 import settings
 import logging
-from folder.path_scanner import path_scanner
-from folder.create_db import create_db
+from path_scanner import path_scanner
+from create_db import create_db
 
 settings.init()
 
@@ -15,3 +15,6 @@ def main():
     logging.info("Starting application...")
     create_db()
     logging.info("Quitting appliaction...")
+
+if __name__ == '__main__':
+    main()
