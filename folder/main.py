@@ -1,5 +1,5 @@
 import settings
-from scanner import path_scanner
+from folder.path_scanner import path_scanner
 
 settings.init()
 

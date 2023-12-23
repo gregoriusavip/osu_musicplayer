@@ -1,5 +1,5 @@
-import scanner
+import folder.path_scanner as path_scanner
 
 def init():
     global osu_folder
-    osu_folder = scanner.default_scanner()
+    osu_folder = path_scanner.default_scanner()
