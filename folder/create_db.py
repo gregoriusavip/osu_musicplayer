@@ -40,6 +40,7 @@ def create_db():
                     Artist TEXT NOT NULL,
                     Creator TEXT NOT NULL,
                     Version TEXT NOT NULL,
+                    Source TEXT,
                     Tags TEXT,
                     songLoc TEXT NOT NULL,
                     backgroundLoc TEXT,
