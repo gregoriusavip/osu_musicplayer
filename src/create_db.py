@@ -3,7 +3,7 @@ import sqlite3
 import logging
 
 # function to create the database for storing beatmaps information
-def create_db():
+def create_db() -> Error:
     message = ""
     logging.info("Creating database...")
     try:
@@ -11,42 +11,44 @@ def create_db():
         db.execute("PRAGMA foreign_keys = 1")
         db_cur = db.cursor()
 
-        logging.info("Removing and creating new beatmaps table...")
-        message = "beatmaps table creation"
-        db_cur.execute("DROP TABLE IF EXISTS beatmaps")
+        logging.info("Removing and creating new Beatmaps table...")
+        message = "Beatmaps table creation"
+        db_cur.execute("DROP TABLE IF EXISTS Beatmaps")
 
         """
-        beatmapID: based of the id of the beatmap
-        metadataVersion: the version of this beatmap metadata for parsing function
+        BeatmapID: Integer ID of the beatmap
         HideSet: boolean to hide the set from display
         """
-        table = """ CREATE TABLE beatmaps (
-                    beatmapID INTEGER PRIMARY KEY UNIQUE,
-                    metadataVersion INTEGER NOT NULL,
+        table = """ CREATE TABLE Beatmaps (
+                    BeatmapID INTEGER PRIMARY KEY UNIQUE,
                     HideSet BOOLEAN NOT NULL CHECK (HideSet IN (0,1))
                 ); """
-        db_cur.execute(table)
-        logging.info("Successfully created beatmaps table")
-
-        logging.info("Removing and creating new beatmapInfo table...")
-        message = "beatmapInfo table creation"
-        db_cur.execute("DROP TABLE IF EXISTS beatmapInfo")
         
-        table = """ CREATE TABLE beatmapInfo (
-                    mainSetID INTEGER PRIMARY KEY UNIQUE,
-                    beatmapSetID INTEGER UNIQUE,
-                    beatmapID INTEGER,
-                    Title TEXT NOT NULL,
-                    Artist TEXT NOT NULL,
-                    Creator TEXT NOT NULL,
-                    Version TEXT NOT NULL,
+        db_cur.execute(table)
+        logging.info("Successfully created Beatmaps table")
+
+        logging.info("Removing and creating new BeatmapInfo table...")
+        message = "beatmapInfo table creation"
+        db_cur.execute("DROP TABLE IF EXISTS BeatmapInfo")
+        
+        table = """ CREATE TABLE BeatmapInfo (
+                    MainID INTEGER PRIMARY KEY UNIQUE,
+                    BeatmapSetID INTEGER UNIQUE,
+                    BeatmapID INTEGER,
+                    Title TEXT,
+                    TitleUnicode TEXT,
+                    Artist TEXT,
+                    ArtistUnicode TEXT,
+                    Creator TEXT,
+                    Version TEXT,
                     Source TEXT,
                     Tags TEXT,
-                    songLoc TEXT NOT NULL,
-                    backgroundLoc TEXT,
+                    AudioFilename TEXT NOT NULL,
+                    BackgroundFilename TEXT,
+                    VideoFilename Text,
                     HideSong BOOLEAN NOT NULL CHECK (HideSong IN (0,1)),
                     HideSet REFERENCES beatmaps(HideSet),
-                    FOREIGN KEY(beatmapID) REFERENCES beatmaps(beatmapID)); """
+                    FOREIGN KEY(BeatmapID) REFERENCES beatmaps(BeatmapID)); """
         db_cur.execute(table)
         logging.info("Successfully created beatmapInfo table")
 
