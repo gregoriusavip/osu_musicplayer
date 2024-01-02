@@ -32,6 +32,7 @@ def _osu_file_read_until(osu_file: IO[str], target: str) -> None:
     logging.info("Parsing file until it reaches the string: " + target)
     # read file until it reaches the target
     for line in (l[:-1] for l in osu_file):
+        logging.debug("Reading line: " + line)
         if line == target:
             logging.info("target string " + target + " is found")
             return
@@ -44,6 +45,7 @@ def _osu_file_general_parse(osu_file: IO[str], beatmap_info: dict) -> None:
     logging.info("Parsing [General] to find the Audio Filename")
     # read until it gets AudioFilename, Content format is `key: value`
     for line in (l[:-1] for l in osu_file):
+        logging.debug("Reading line: " + line)
         data = line.split(":")
         if(data[0] == "AudioFilename"):
             logging.debug("Found the audio filename: " + data[1][1:])
@@ -61,6 +63,7 @@ def _osu_file_metadata_parse(osu_file: IO[str], beatmap_info: dict) -> None:
     logging.info("Parsing [Metadata] for beatmap information")
     # read metadata until it reaches an empty line
     for line in (l[:-1] for l in osu_file):
+        logging.debug("Reading line: " + line)
         if not re.match(r'^\s*$', line):
             data = line.split(":")
             logging.debug("Found the data: " + data[0])
@@ -133,5 +136,4 @@ def song_parser(osu_file: IO[str], base_song_folder_path: str) -> dict:
     res = _osu_file_parser(osu_file)
     if(version < 10):
         res["BeatmapSetID"] = _extract_beatmap_id(base_song_folder_path)
-    print(res)
     return res
