@@ -45,7 +45,6 @@ def create_db() -> Error:
                     Tags TEXT,
                     AudioFilename TEXT NOT NULL,
                     BackgroundFilename TEXT,
-                    VideoFilename Text,
                     HideSong BOOLEAN NOT NULL CHECK (HideSong IN (0,1)),
                     HideSet REFERENCES beatmaps(HideSet),
                     FOREIGN KEY(BeatmapID) REFERENCES beatmaps(BeatmapID)); """
