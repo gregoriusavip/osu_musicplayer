@@ -3,20 +3,9 @@ import logging
 from path_scanner import path_scanner
 from create_db import create_db
 from scan_folder.scanner import scanner
-from logging.handlers import RotatingFileHandler
 from pathlib import Path
 import os
-
-log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
-logFile = os.path.join(os.getcwd(), 'log')
-handler = RotatingFileHandler(logFile, mode='w', maxBytes=5*1024*1024, 
-                              backupCount=2, encoding='utf-8', delay=0)
-handler.setFormatter(log_formatter)
-handler.setLevel(logging.DEBUG)
-
-app_log = logging.getLogger('root')
-app_log.setLevel(logging.DEBUG)
-app_log.addHandler(handler)
+import cProfile
 
 def main():
     settings.init()
@@ -31,5 +20,5 @@ def main():
 
 if __name__ == '__main__':
     logging.info("Starting application...")
-    main()
+    cProfile.run('main()', 'restats', sort='tottime')
     logging.info("Quitting appliaction...")
