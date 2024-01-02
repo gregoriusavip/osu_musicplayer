@@ -2,9 +2,21 @@ import settings
 import logging
 from path_scanner import path_scanner
 from create_db import create_db
-import song_parser
+from scan_folder.scanner import scanner
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+import os
 
-logging.basicConfig(format='%(asctime)s %(message)s', filename="debug.log", level=logging.DEBUG)
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
+logFile = os.path.join(os.getcwd(), 'log')
+handler = RotatingFileHandler(logFile, mode='w', maxBytes=5*1024*1024, 
+                              backupCount=2, encoding='utf-8', delay=0)
+handler.setFormatter(log_formatter)
+handler.setLevel(logging.DEBUG)
+
+app_log = logging.getLogger('root')
+app_log.setLevel(logging.DEBUG)
+app_log.addHandler(handler)
 
 def main():
     settings.init()
@@ -14,13 +26,10 @@ def main():
         settings.osu_folder = path_scanner(path)
         
     create_db()
-
-    from pathlib import Path
-    import os
-    songs_directory = os.path.join(Path.home(), 'Appdata', 'Local', 'osu!', "Songs", "210 Taiko no Tatsujin - Saitama2000")
-    song_parser.extract_beatmap_id(os.path.basename(songs_directory))
+    songs_directory = os.path.join(Path.home(), 'Appdata', 'Local', 'osu!', "Songs")
+    scanner(songs_directory)
 
 if __name__ == '__main__':
     logging.info("Starting application...")
     main()
-    logging.info("Quitting appliaction...\n")
+    logging.info("Quitting appliaction...")
