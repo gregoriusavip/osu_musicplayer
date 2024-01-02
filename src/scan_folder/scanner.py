@@ -12,6 +12,6 @@ def scanner(songs_directory):
             for file in files:
                 if fnmatch.fnmatch(file, "*.osu"):
                     with open(os.path.join(root, file), "r", encoding='utf-8-sig') as osu_file:
-                        logging.info("Reading " + file)
+                        logging.debug("Reading " + file)
                         song_parser(osu_file, os.path.basename(root))
     logging.info("SCANNING SUCCESS")
