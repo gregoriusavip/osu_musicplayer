@@ -2,3 +2,5 @@ __pycache__/
 *.sql
 *.db
 log*
+profiler*
+restats
