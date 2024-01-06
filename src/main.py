@@ -21,5 +21,5 @@ def main():
     scanner(songs_directory)
 
 if __name__ == '__main__':
-    cProfile.run('main()', 'restats', sort='tottime')
+    cProfile.run('main()', 'restats')
     logging.info("Quitting appliaction...")
