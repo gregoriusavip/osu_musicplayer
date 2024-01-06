@@ -14,4 +14,4 @@ def scanner(songs_directory):
                     with open(os.path.join(root, file), "r", encoding='utf-8-sig') as osu_file:
                         logging.debug("Reading " + file)
                         song_parser(osu_file, os.path.basename(root))
-    logging.info("SCANNING SUCCESS")
+    logging.info("SCANNING FINISHED")
