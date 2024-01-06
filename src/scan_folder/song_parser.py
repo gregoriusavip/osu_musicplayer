@@ -1,3 +1,9 @@
+"""
+TODO: 
+- When there is a warning, logging should also gives the file it is currently parsing
+- Make warning calls to be a function with a given message instead of repetition of logging.warning
+"""
+
 from typing import IO
 import logging
 import re
@@ -19,22 +25,22 @@ def _extract_beatmap_id(beatmap_folder_name: str) -> str:
     `str`: the ID of this beatmap if exist, `None` otherwise
     """
 
-    logging.info("Extracting beatmap ID from folder " + beatmap_folder_name)
+    logging.debug("Extracting beatmap ID from folder " + beatmap_folder_name)
     beatmapID = re.match(pattern, beatmap_folder_name)
     if beatmapID:
         beatmapID = beatmapID.group(0)[:-1]
-        logging.info("Extracted ID " + beatmapID)
+        logging.debug("Extracted ID " + beatmapID)
         return beatmapID
     logging.warning("ID could not be extracted")
     return beatmapID
 
 def _osu_file_read_until(osu_file: IO[str], target: str) -> None:
-    logging.info("Parsing file until it reaches the string: " + target)
+    logging.debug("Parsing file until it reaches the string: " + target)
     # read file until it reaches the target
     for line in (l[:-1] for l in osu_file):
         logging.debug("Reading line: " + line)
         if line == target:
-            logging.info("target string " + target + " is found")
+            logging.debug("target string " + target + " is found")
             return
         
     logging.warning("WARNING: target string " + target + " could not be found.\n"
@@ -42,7 +48,7 @@ def _osu_file_read_until(osu_file: IO[str], target: str) -> None:
                     )
 
 def _osu_file_general_parse(osu_file: IO[str], beatmap_info: dict) -> None:
-    logging.info("Parsing [General] to find the Audio Filename")
+    logging.debug("Parsing [General] to find the Audio Filename")
     # read until it gets AudioFilename, Content format is `key: value`
     for line in (l[:-1] for l in osu_file):
         logging.debug("Reading line: " + line)
@@ -57,10 +63,10 @@ def _osu_file_general_parse(osu_file: IO[str], beatmap_info: dict) -> None:
                         + "The file might be corrupted or an Error occured during the parsing process.")
     else:
         logging.debug("Key:" + GENERAL_KEYS + ", Value:" + beatmap_info[GENERAL_KEYS])
-        logging.info("Finished parsing through [General]")
+        logging.debug("Finished parsing through [General]")
 
 def _osu_file_metadata_parse(osu_file: IO[str], beatmap_info: dict) -> None:
-    logging.info("Parsing [Metadata] for beatmap information")
+    logging.debug("Parsing [Metadata] for beatmap information")
     # read metadata until it reaches an empty line
     for line in (l[:-1] for l in osu_file):
         logging.debug("Reading line: " + line)
@@ -79,10 +85,10 @@ def _osu_file_metadata_parse(osu_file: IO[str], beatmap_info: dict) -> None:
     empty_keys = [key for key in METADATA_KEYS if beatmap_info.get(key) is None]
     if len(empty_keys) != 0:
         logging.warning("The following key(s) " + str(empty_keys) + " has an empty value")
-    logging.info("Finished parsing through [Metadata]")
+    logging.debug("Finished parsing through [Metadata]")
 
 def _osu_file_events_parse(osu_file: IO[str], beatmap_info: dict) -> None:
-    logging.info("Parsing [Events] for background and or video filename")
+    logging.debug("Parsing [Events] for background and or video filename")
     # read events until it reaches an empty line
     for line in (l[:-1] for l in osu_file):
         logging.debug("Reading line: " + line)
@@ -98,7 +104,7 @@ def _osu_file_events_parse(osu_file: IO[str], beatmap_info: dict) -> None:
     
     if beatmap_info[EVENTS_KEYS] == None:
         logging.warning("WARNING: " + EVENTS_KEYS + " is missing from parsing [Events].")
-    logging.info("Finished parsing through [Events]")
+    logging.debug("Finished parsing through [Events]")
 
 # osu_file format is based of https://osu.ppy.sh/wiki/en/Client/File_formats/osu_%28file_format%29
 def _osu_file_parser(osu_file: IO[str]) -> dict:
