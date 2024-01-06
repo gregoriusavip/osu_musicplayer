@@ -1,6 +1,7 @@
-from Error import Error
+from db.Error import Error
 import sqlite3
 import logging
+from db.sql_error import sql_error_handler
 
 # function to create the database for storing beatmaps information
 def create_db() -> Error:
@@ -59,8 +60,3 @@ def create_db() -> Error:
         sql_error_handler(e, message)
         return Error.SQL_ERROR
     
-def sql_error_handler(e, message):
-    reason = "Task " + message + " could not be completed."
-    logging.critical(reason)
-    logging.error('Sql error: %s' % (' '.join(e.args)))
-    logging.error("Exception class is: ", e.__class__)
