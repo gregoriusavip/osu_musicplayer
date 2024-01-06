@@ -10,7 +10,7 @@ import cProfile
 def main():
     settings.init()
     logging.info("Starting application...")
-    logging.info("Settings initialized")
+    logging.info("Settings initialized\n")
     if not settings.osu_folder:
         logging.info("osu songs folder cannot be located.")
         path = "some_path"
@@ -22,4 +22,4 @@ def main():
 
 if __name__ == '__main__':
     cProfile.run('main()', 'restats')
-    logging.info("Quitting appliaction...")
+    logging.info("Quitting appliaction..." + "\n")

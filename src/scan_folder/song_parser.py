@@ -1,9 +1,3 @@
-"""
-TODO: 
-- When there is a warning, logging should also gives the file it is currently parsing
-- Make warning calls to be a function with a given message instead of repetition of logging.warning
-"""
-
 from typing import IO
 import logging
 import re
@@ -14,6 +8,9 @@ METADATA_KEYS = ["Title", "TitleUnicode", "Artist", "ArtistUnicode",
 EVENTS_KEYS = "BackgroundFilename"
 
 pattern = re.compile("^[0-9]* ")
+
+def _warning_default_message(file_name: str) -> None:
+    logging.warning("From file: " + file_name + "\n")
 
 def _extract_beatmap_id(beatmap_folder_name: str) -> str:
     """extract the beatmapID from the folder name
@@ -43,9 +40,9 @@ def _osu_file_read_until(osu_file: IO[str], target: str) -> None:
             logging.debug("target string " + target + " is found")
             return
         
-    logging.warning("WARNING: target string " + target + " could not be found.\n"
-                    + "The file might be corrupted or an Error occured during the parsing process."
-                    )
+    logging.warning("WARNING: target string " + target + " could not be found.\n")
+    _warning_default_message(osu_file.name)
+    
 
 def _osu_file_general_parse(osu_file: IO[str], beatmap_info: dict) -> None:
     logging.debug("Parsing [General] to find the Audio Filename")
@@ -59,8 +56,8 @@ def _osu_file_general_parse(osu_file: IO[str], beatmap_info: dict) -> None:
             break
     
     if beatmap_info[GENERAL_KEYS] is None:
-        logging.warning("WARNING: " + GENERAL_KEYS + " is missing from parsing [General].\n"
-                        + "The file might be corrupted or an Error occured during the parsing process.")
+        logging.warning("WARNING: " + GENERAL_KEYS + " is missing from parsing [General].\n")
+        _warning_default_message(osu_file.name)
     else:
         logging.debug("Key:" + GENERAL_KEYS + ", Value:" + beatmap_info[GENERAL_KEYS])
         logging.debug("Finished parsing through [General]")
@@ -77,6 +74,7 @@ def _osu_file_metadata_parse(osu_file: IO[str], beatmap_info: dict) -> None:
                 beatmap_info[data[0]] = data[1]
             else:
                 logging.warning("line: " + line + " is not formatted as a key:value pairs. This line will be ignored")
+                _warning_default_message(osu_file.name)
                 continue
             logging.debug("Key:" + data[0] + ", Value:" + beatmap_info[data[0]])
         else:
@@ -85,6 +83,7 @@ def _osu_file_metadata_parse(osu_file: IO[str], beatmap_info: dict) -> None:
     empty_keys = [key for key in METADATA_KEYS if beatmap_info.get(key) is None]
     if len(empty_keys) != 0:
         logging.warning("The following key(s) " + str(empty_keys) + " has an empty value")
+        _warning_default_message(osu_file.name)
     logging.debug("Finished parsing through [Metadata]")
 
 def _osu_file_events_parse(osu_file: IO[str], beatmap_info: dict) -> None:
@@ -104,6 +103,7 @@ def _osu_file_events_parse(osu_file: IO[str], beatmap_info: dict) -> None:
     
     if beatmap_info[EVENTS_KEYS] == None:
         logging.warning("WARNING: " + EVENTS_KEYS + " is missing from parsing [Events].")
+        _warning_default_message(osu_file.name)
     logging.debug("Finished parsing through [Events]")
 
 # osu_file format is based of https://osu.ppy.sh/wiki/en/Client/File_formats/osu_%28file_format%29

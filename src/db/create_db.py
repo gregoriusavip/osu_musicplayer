@@ -1,4 +1,4 @@
-from db.Error import Error
+from db.error_enum import Error
 import sqlite3
 import logging
 from db.sql_error import sql_error_handler
@@ -54,7 +54,7 @@ def create_db() -> Error:
 
         message = "closing database cursor"
         db_cur.close()
-        logging.info("Created database.")
+        logging.info("Created database.\n")
         return Error.SUCCESS
     except sqlite3.Error as e:
         sql_error_handler(e, message)
