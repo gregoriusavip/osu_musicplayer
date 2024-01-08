@@ -9,32 +9,15 @@ def create_db() -> Error:
     logging.info("Creating database...")
     try:
         db = sqlite3.connect("beatmaps.sql")
-        db.execute("PRAGMA foreign_keys = 1")
         db_cur = db.cursor()
 
-        logging.info("Removing and creating new Beatmaps table...")
-        message = "Beatmaps table creation"
-        db_cur.execute("DROP TABLE IF EXISTS Beatmaps")
-
-        """
-        BeatmapID: Integer ID of the beatmap
-        HideSet: boolean to hide the set from display
-        """
-        table = """ CREATE TABLE Beatmaps (
-                    BeatmapID INTEGER PRIMARY KEY UNIQUE,
-                    HideSet BOOLEAN NOT NULL CHECK (HideSet IN (0,1))
-                ); """
+        logging.info("Removing and creating new beatmaps table...")
+        message = "beatmaps table creation"
+        db_cur.execute("DROP TABLE IF EXISTS beatmaps")
         
-        db_cur.execute(table)
-        logging.info("Successfully created Beatmaps table")
-
-        logging.info("Removing and creating new BeatmapInfo table...")
-        message = "beatmapInfo table creation"
-        db_cur.execute("DROP TABLE IF EXISTS BeatmapInfo")
-        
-        table = """ CREATE TABLE BeatmapInfo (
-                    MainID INTEGER PRIMARY KEY UNIQUE,
-                    BeatmapSetID INTEGER UNIQUE,
+        table = """ CREATE TABLE beatmaps (
+                    MainID INTEGER PRIMARY KEY,
+                    BeatmapSetID INTEGER,
                     BeatmapID INTEGER,
                     Title TEXT,
                     TitleUnicode TEXT,
@@ -46,9 +29,7 @@ def create_db() -> Error:
                     Tags TEXT,
                     AudioFilename TEXT NOT NULL,
                     BackgroundFilename TEXT,
-                    HideSong BOOLEAN NOT NULL CHECK (HideSong IN (0,1)),
-                    HideSet REFERENCES beatmaps(HideSet),
-                    FOREIGN KEY(BeatmapID) REFERENCES beatmaps(BeatmapID)); """
+                    HideSong BOOLEAN NOT NULL CHECK (HideSong IN (0,1))); """
         db_cur.execute(table)
         logging.info("Successfully created beatmapInfo table")
 
