@@ -1,11 +1,8 @@
 from typing import IO
 import logging
+import settings
 import re
-
-GENERAL_KEYS = "AudioFilename"
-METADATA_KEYS = ["Title", "TitleUnicode", "Artist", "ArtistUnicode", 
-                 "Creator", "Version", "Source", "Tags", "BeatmapID", "BeatmapSetID"]
-EVENTS_KEYS = "BackgroundFilename"
+import os
 
 pattern = re.compile("^[0-9]* ")
 
@@ -55,11 +52,11 @@ def _osu_file_general_parse(osu_file: IO[str], beatmap_info: dict) -> None:
             beatmap_info[data[0]] = data[1][1:]
             break
     
-    if beatmap_info[GENERAL_KEYS] is None:
-        logging.warning("WARNING: " + GENERAL_KEYS + " is missing from parsing [General].\n")
+    if beatmap_info[settings.GENERAL_KEYS] is None:
+        logging.warning("WARNING: " + settings.GENERAL_KEYS + " is missing from parsing [General].\n")
         _warning_default_message(osu_file.name)
     else:
-        logging.debug("Key:" + GENERAL_KEYS + ", Value:" + beatmap_info[GENERAL_KEYS])
+        logging.debug("Key:" + settings.GENERAL_KEYS + ", Value:" + beatmap_info[settings.GENERAL_KEYS])
         logging.debug("Finished parsing through [General]")
 
 def _osu_file_metadata_parse(osu_file: IO[str], beatmap_info: dict) -> None:
@@ -80,7 +77,7 @@ def _osu_file_metadata_parse(osu_file: IO[str], beatmap_info: dict) -> None:
         else:
             break
     
-    empty_keys = [key for key in METADATA_KEYS if beatmap_info.get(key) is None]
+    empty_keys = [key for key in settings.METADATA_KEYS if beatmap_info.get(key) is None]
     if len(empty_keys) != 0:
         logging.warning("The following key(s) " + str(empty_keys) + " has an empty value")
         _warning_default_message(osu_file.name)
@@ -96,23 +93,23 @@ def _osu_file_events_parse(osu_file: IO[str], beatmap_info: dict) -> None:
                 pass
             data = line.split(",")
             if (data[0] == "0") and (data[1] == "0") :
-                beatmap_info[EVENTS_KEYS] = data[2][1:-1]
+                beatmap_info[settings.EVENTS_KEYS] = data[2][1:-1]
                 break
         else:
             break
     
-    if beatmap_info[EVENTS_KEYS] == None:
-        logging.warning("WARNING: " + EVENTS_KEYS + " is missing from parsing [Events].")
+    if beatmap_info[settings.EVENTS_KEYS] == None:
+        logging.warning("WARNING: " + settings.EVENTS_KEYS + " is missing from parsing [Events].")
         _warning_default_message(osu_file.name)
     logging.debug("Finished parsing through [Events]")
 
 # osu_file format is based of https://osu.ppy.sh/wiki/en/Client/File_formats/osu_%28file_format%29
 def _osu_file_parser(osu_file: IO[str]) -> dict:
     beatmap_info = dict()
-    beatmap_info[GENERAL_KEYS] = None
-    for key in METADATA_KEYS:
+    beatmap_info[settings.GENERAL_KEYS] = None
+    for key in settings.METADATA_KEYS:
         beatmap_info[key] = None
-    beatmap_info[EVENTS_KEYS] = None
+    beatmap_info[settings.EVENTS_KEYS] = None
 
     # read until reaches "[General]"
     _osu_file_read_until(osu_file, "[General]")
@@ -142,4 +139,7 @@ def song_parser(osu_file: IO[str], base_song_folder_path: str) -> dict:
     res = _osu_file_parser(osu_file)
     if(version < 10):
         res["BeatmapSetID"] = _extract_beatmap_id(base_song_folder_path)
+    res[settings.GENERAL_KEYS] = os.path.join(base_song_folder_path, res[settings.GENERAL_KEYS])
+    if(res[settings.EVENTS_KEYS] is not None):
+        res[settings.EVENTS_KEYS] = os.path.join(base_song_folder_path, res[settings.EVENTS_KEYS])
     return res
