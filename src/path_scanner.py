@@ -30,3 +30,10 @@ def path_scanner(osu_path: str):
         return None
     return songs_directory
 
+def get_database_path():
+    database = os.path.join(os.getcwd(), "beatmaps.sql")
+
+    if os.path.exists(database):
+        return database
+    return None
+    
