@@ -10,8 +10,8 @@ def _isclosed(conn) -> bool:
     """
     A private helper function to check if a connection is closed.
 
-    :param conn: a valid connection to an sqlite3 database
-    :return: True if try block catched an error when establishing cursor to database, False otherwise
+    :param `conn`: a valid connection to an sqlite3 database
+    :return: `True` if try block catched an error when establishing cursor to database, `False` otherwise
     """
     try:
         conn.cursor()
@@ -33,6 +33,7 @@ def scanner(songs_directory) -> Error:
                     logging.debug("Reading " + file)
                     data = song_parser(osu_file, os.path.basename(root))
                     add_beatmap(conn, data)
+    conn.cursor().execute("PRAGMA optimize")
     conn.close()
     logging.info("----------------------------SCANNING FINISHED----------------------------\n")
     return Error.SUCCESS
