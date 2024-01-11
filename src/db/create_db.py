@@ -1,18 +1,24 @@
-from db.error_enum import Error
 import sqlite3
 import logging
+import settings
+from db.error_enum import Error
 from db.sql_error import sql_error_handler
 
-# function to create the database for storing beatmaps information
-def create_db() -> Error:
+def create_db():
+    """
+    function to create the database for storing beatmaps information.
+
+    :return: enum Error flag. `Error.SUCCESS` if no error occurred, `Error.SQL_ERROR` otherwise.
+    """
     message = ""
+    ret = Error.SUCCESS # return flag
     logging.info("Creating database...")
     try:
-        db = sqlite3.connect("beatmaps.sql")
+        db = sqlite3.connect(settings.DATABASE_NAME)
         db_cur = db.cursor()
 
         logging.info("Removing and creating new beatmaps table...")
-        message = "beatmaps table creation"
+        message = "Table creation"
         db_cur.execute("DROP TABLE IF EXISTS beatmaps")
         
         table = """ CREATE TABLE beatmaps (
@@ -30,14 +36,15 @@ def create_db() -> Error:
                     AudioFilename TEXT NOT NULL,
                     BackgroundFilename TEXT,
                     HideSong BOOLEAN NOT NULL CHECK (HideSong IN (0,1))); """
+        
         db_cur.execute(table)
         logging.info("Successfully created beatmapInfo table")
-
-        message = "closing database cursor"
-        db_cur.close()
         logging.info("Created database.\n")
-        return Error.SUCCESS
     except sqlite3.Error as e:
         sql_error_handler(e, message)
-        return Error.SQL_ERROR
+        ret = Error.SQL_ERROR
+    finally:
+        db_cur.close()
+        db.close()
     
+    return ret

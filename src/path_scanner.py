@@ -1,39 +1,32 @@
-from pathlib import Path
+import settings
 import os
 
-def default_scanner():
-    """Scans the user from home directory to locate osu folder.
-
-    NOTE: Run `path_scanner` instead if default location is not found.
-
-    Returns: 
-    `str`: path to the songs folder if exist, `None` otherwise
-    """
-    songs_directory = os.path.join(Path.home(), 'Appdata', 'Local', 'osu!', "Songs")
-    if not os.path.exists(songs_directory):
-        return None
-    return songs_directory
-
 def path_scanner(osu_path: str):
-    """function to check if a given folder directory contains "Songs" folder
+    """
+    function to check if a given folder directory contains "Songs" folder
 
     NOTE: does not check if it is a valid osu folder or if the songs folder is invalid
 
     Parameters:
     `osu_path` (str): path to the folder containing `Songs` folder
 
-    Returns: 
-    `str`: path to the songs folder if exist, `None` otherwise
+    :return: `True` if path exists, `False` otherwise
     """
     songs_directory = os.path.join(osu_path, "Songs")
-    if not os.path.exists(songs_directory):
-        return None
-    return songs_directory
+    if os.path.exists(songs_directory):
+        return True
+    return False
 
-def get_database_path():
-    database = os.path.join(os.getcwd(), "beatmaps.sql")
+def database_exists():
+    """
+    helper function to check if a database exist in the current working directory.
+
+    :return: `True` if the database exist, `False` otherwise.
+    """
+
+    database = os.path.join(os.getcwd(), settings.DATABASE_NAME)
 
     if os.path.exists(database):
-        return database
-    return None
+        return True
+    return False
     
