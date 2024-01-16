@@ -1,7 +1,7 @@
 import sqlite3
 import logging
 import settings
-from db.sql_error import sql_error_handler
+from error_handler import error_handler
 from db.error_enum import Error
 
 def isclosed(conn) -> bool:
@@ -28,7 +28,7 @@ def create_connection():
     try:
         conn = sqlite3.connect(settings.DATABASE_NAME)
     except sqlite3.Error as e:
-        sql_error_handler(e, "Connect to an sqlite3 db named " + settings.DATABASE_NAME)
+        error_handler(e, "Connect to an sqlite3 db named " + settings.DATABASE_NAME)
     
     return conn
 
@@ -50,7 +50,7 @@ def create_cursor(conn):
             cursor.execute(statement)
     except sqlite3.Error as e:
         # Close the connection if an error occurred
-        sql_error_handler(e, "Establish a cursor for the database.")
+        error_handler(e, "Establish a cursor for the database.")
         conn.close()
     
     return cursor
@@ -82,7 +82,7 @@ def add_beatmap(conn, beatmapInfo) -> Error:
         conn.commit()
     except sqlite3.Error as e:
         #Close the connection if an error occured
-        sql_error_handler(e, "Failed to add beatmap to the database.\nData: " + beatmapInfo.__str__())
+        error_handler(e, "Failed to add beatmap to the database.\nData: " + beatmapInfo.__str__())
         ret = Error.SQL_ERROR
         conn.close()
     finally:

@@ -2,7 +2,7 @@ import sqlite3
 import logging
 import settings
 from db.error_enum import Error
-from db.sql_error import sql_error_handler
+from error_handler import error_handler
 
 def create_db():
     """
@@ -41,7 +41,7 @@ def create_db():
         logging.info("Successfully created beatmapInfo table")
         logging.info("Created database.\n")
     except sqlite3.Error as e:
-        sql_error_handler(e, message)
+        error_handler(e, message)
         ret = Error.SQL_ERROR
     finally:
         db_cur.close()

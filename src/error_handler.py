@@ -1,8 +1,8 @@
 import logging
 
-def sql_error_handler(e, task):
+def error_handler(e, task: str):
     """
-    Helper function to handle when an error occured during sqlite operation.
+    Helper function to log when an error occured during the program runtime.
 
     :param1 `e`: the exception that was caught on the catch block
     :param2 `message`: the task operation that was attempted
@@ -11,5 +11,4 @@ def sql_error_handler(e, task):
     """
     reason = "Task: " + task + " could not be completed."
     logging.critical(reason)
-    logging.error('Sql error: %s' % (' '.join(e.args)))
-    logging.error("Exception class is: ", e.__class__)
+    logging.error('Error: %s' % (' '.join(e.args)))
