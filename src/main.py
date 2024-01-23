@@ -1,7 +1,5 @@
-# timer/profiler for debugging
+# profiler for debugging
 import cProfile
-import timeit
-from functools import partial
 
 # settings and logging
 import settings
@@ -16,6 +14,15 @@ from scan_folder.scanner import scanner
 # music player functionality
 from music_player.controller import test
 
+def display_songs(song_list):
+    index = 0
+    print("Title\t TitleUnicode\t Artist\t ArtistUnicode\t Mapper\t BeatmapSetID")
+    for row in song_list:
+        print(f"{row[0]}\t {row[1]}\t {row[2]}\t {row[3]}\t {row[4]}\t {row[5]}")
+        index += 1
+        if index == 50:
+            break
+
 def main():
     # initialized settings
     settings.init()
@@ -26,9 +33,8 @@ def main():
         create_db()
         songs_directory = settings.OSU_FOLDER
         scanner(songs_directory)   # TODO: handle error
-    partial_function = partial(query_beatmap, user_query="nakuru", sort_by="Title")
-    execution_time = timeit.timeit(partial_function, number=1)
-    print(f"Execution time: {execution_time} seconds")
+    data = query_beatmap("nakuru", "Title")
+    display_songs(data)
     test()
 
 if __name__ == '__main__':
