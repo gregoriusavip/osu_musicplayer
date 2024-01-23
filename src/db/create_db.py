@@ -2,13 +2,13 @@ import sqlite3
 import logging
 import settings
 from db.error_enum import Error
-from db.sql_error import sql_error_handler
+from error_handler import error_handler
 
 def create_db():
     """
     function to create the database for storing beatmaps information.
 
-    :return: enum Error flag. `Error.SUCCESS` if no error occurred, `Error.SQL_ERROR` otherwise.
+    :return: enum Error flag. `Error.SUCCESS` if no error occurred, `Error.SQL_EXECUTION_ERROR` otherwise.
     """
     message = ""
     ret = Error.SUCCESS # return flag
@@ -41,8 +41,8 @@ def create_db():
         logging.info("Successfully created beatmapInfo table")
         logging.info("Created database.\n")
     except sqlite3.Error as e:
-        sql_error_handler(e, message)
-        ret = Error.SQL_ERROR
+        error_handler(e, message)
+        ret = Error.SQL_EXECUTE_ERROR
     finally:
         db_cur.close()
         db.close()

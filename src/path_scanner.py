@@ -13,9 +13,7 @@ def path_scanner(osu_path: str):
     :return: `True` if path exists, `False` otherwise
     """
     songs_directory = os.path.join(osu_path, "Songs")
-    if os.path.exists(songs_directory):
-        return True
-    return False
+    return os.path.exists(songs_directory)
 
 def database_exists():
     """

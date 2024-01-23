@@ -21,10 +21,10 @@ def scanner(songs_directory) -> Error:
                     logging.debug("Reading " + file)
                     data = song_parser(osu_file, os.path.basename(root))
                     ret = add_beatmap(conn, data)
-                    if(ret == Error.SQL_ERROR):
+                    if(ret == Error.SQL_EXECUTE_ERROR):
                         # connection is closed, handled by add_beatmap
                         logging.critical("An error occured during sql operation. Stopping scan process.")
-                        return Error.SQL_ERROR
+                        return Error.SQL_EXECUTE_ERROR
     else:
         logging.warning("path to osu songs folder does not exist.")
         logging.warning("path: " + songs_directory + "\n")

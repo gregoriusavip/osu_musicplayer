@@ -1,16 +1,27 @@
 from logging.handlers import RotatingFileHandler
 import logging
 import os
+from pathlib import Path
 
 def init():
     # GLOBAL VARIABLES
-    global osu_folder, DATABASE_NAME, GENERAL_KEYS, METADATA_KEYS, EVENTS_KEYS
+    global OSU_FOLDER, DATABASE_NAME, GENERAL_KEYS, METADATA_KEYS, EVENTS_KEYS
     GENERAL_KEYS = "AudioFilename"
     METADATA_KEYS = ["Title", "TitleUnicode", "Artist", "ArtistUnicode", 
                     "Creator", "Version", "Source", "Tags", "BeatmapID", "BeatmapSetID"]
     EVENTS_KEYS = "BackgroundFilename"
     DATABASE_NAME = "beatmaps.sql"
-    osu_folder = ""
+
+    # default osu path, handle path creation if default path is not valid
+    osu_folder = os.path.join(Path.home(), 'Appdata', 'Local', 'osu!', 'Songs')
+    
+    if not os.path.exists(osu_folder): #NOTE change to loop until valid path
+        logging.info("osu songs folder cannot be located.")
+        path = "some_path"  #NOTE ask user for the path
+        osu_folder = path
+        # repeat
+    
+    OSU_FOLDER = osu_folder
 
     # LOGGING SETTINGS
     log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
