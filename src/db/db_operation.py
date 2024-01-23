@@ -103,7 +103,8 @@ def _get_query_top() -> str:
     helper function to get the top part of a default query.
     """
     query = """
-            SELECT DISTINCT BeatmapSetID, Title, Artist, AudioFilename
+            SELECT DISTINCT Title, TitleUnicode, Artist, ArtistUnicode, 
+            Creator, BeatmapSetID, BackgroundFilename, AudioFilename
             FROM beatmaps
                 WHERE
                     (BeatmapSetID IS NOT NULL AND BeatmapSetID <> -1)
@@ -115,29 +116,30 @@ def _execute_query(query: str, user_query=None):
     Execute an SQL query and handle errors
     """
     conn = create_connection()
-    error = False
-    if conn:
-        cursor = create_cursor(conn)
-        try:
-            if user_query:
-                cursor.execute(query, ("%" + user_query + "%",))
-            else:
-                cursor.execute(query)
-            for row in cursor.fetchall():
-                print(row)
-        except sqlite3.Error as e:
-            # Close the connection if an error occurred
-            error_handler(e, "Query: " + query)
-            error = True
-        finally:
-            cursor.close()
-            conn.close()
-    else:
+    if conn is None:
         return Error.SQL_CONNECTION_ERROR
+    
+    cursor = create_cursor(conn)
+    if cursor is None:
+        return Error.SQL_ERROR
+    
+    data = None
+    try:
+        if user_query is not None or user_query == "":
+            cursor.execute(query, ("%" + user_query + "%",))
+        else:
+            cursor.execute(query)
+        data = cursor.fetchall()
+    except sqlite3.Error as e:
+        # Close the connection if an error occurred
+        error_handler(e, "Query: " + query)
+    finally:
+        cursor.close()
+        conn.close()
 
-    if error:
+    if not data:
         return Error.SQL_EXECUTE_ERROR
-    return Error.SUCCESS
+    return data
 
 def _inject_sort(query: str, sort_by: str):
     """
@@ -154,13 +156,16 @@ def _inject_sort(query: str, sort_by: str):
     if lower_sort_by not in sorting_columns:
         raise ValueError("Invalid sort column specified.")
     
-    res_query = query + f" ORDER BY {sorting_columns.get(lower_sort_by)} LIMIT 50;"
+    res_query = query + f" ORDER BY {sorting_columns.get(lower_sort_by)};"
     
     return res_query
 
 def default_select(sort_by: str) -> Error:
     """
     default query, return the result sorted by a given sort
+
+    :return: if an error occured, `SQL_EXECUTE_ERROR`/`SQL_CONNECTION_ERROR`
+    otherwise, the result as a `list`
     """
     query = _get_query_top()
     try:
@@ -172,8 +177,12 @@ def default_select(sort_by: str) -> Error:
 
 def query_beatmap(user_query: str, sort_by: str) -> Error:
     """
-    from a user query, search within the database and return the result
+    from a user query, search within the database.
+    
+    :return: if an error occured, `SQL_EXECUTE_ERROR`/`SQL_CONNECTION_ERROR`
+    otherwise, the result as a `list`
     """
+    
     query = (_get_query_top()
                 + """
                     AND (
