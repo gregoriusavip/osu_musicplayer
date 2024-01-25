@@ -79,7 +79,7 @@ def add_beatmap(conn, beatmapInfo) -> Error:
     try:
         insert = """
                     INSERT INTO beatmaps VALUES 
-                    (null, :BeatmapSetID, :BeatmapID, :Title, :TitleUnicode, :Artist, 
+                    (:BeatmapSetID, :BeatmapID, :Title, :TitleUnicode, :Artist, 
                     :ArtistUnicode, :Creator, :Version, :Source, :Tags, :AudioFilename, :BackgroundFilename, 0)
                 """
         cursor.execute(insert, beatmapInfo)
