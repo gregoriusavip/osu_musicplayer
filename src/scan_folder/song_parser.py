@@ -132,12 +132,14 @@ def _osu_file_parser(osu_file: IO[str]) -> dict:
     return beatmap_info
 
 def song_parser(osu_file: IO[str], base_song_folder_path: str) -> dict:
+    version = None
     for line in osu_file:
+        logging.debug("Reading line: " + line)
         if not re.match(r'^\s*$', line.strip('\n')):
             version = int(line.split()[3][1:])
             break
     res = _osu_file_parser(osu_file)
-    if(version < 10):
+    if(version is not None and version < 10):
         res["BeatmapSetID"] = _extract_beatmap_id(base_song_folder_path)
     res[settings.GENERAL_KEYS] = os.path.join(base_song_folder_path, res[settings.GENERAL_KEYS])
     if(res[settings.EVENTS_KEYS] is not None):
