@@ -22,7 +22,8 @@ def create_db():
         db_cur.execute("DROP TABLE IF EXISTS beatmaps")
         
         table = """ CREATE TABLE beatmaps (
-                    MainID INTEGER PRIMARY KEY,
+                    mainID INTEGER PRIMARY KEY,
+                    groupID INTEGER,
                     BeatmapSetID INTEGER,
                     BeatmapID INTEGER,
                     Title TEXT,

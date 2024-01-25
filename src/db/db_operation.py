@@ -79,7 +79,7 @@ def add_beatmap(conn, beatmapInfo) -> Error:
     try:
         insert = """
                     INSERT INTO beatmaps VALUES 
-                    (null, :BeatmapSetID, :BeatmapID, :Title, :TitleUnicode, :Artist, 
+                    (null, :groupID, :BeatmapSetID, :BeatmapID, :Title, :TitleUnicode, :Artist, 
                     :ArtistUnicode, :Creator, :Version, :Source, :Tags, :AudioFilename, :BackgroundFilename, 0)
                 """
         cursor.execute(insert, beatmapInfo)
@@ -103,11 +103,16 @@ def _get_query_top() -> str:
     helper function to get the top part of a default query.
     """
     query = """
-            SELECT DISTINCT Title, TitleUnicode, Artist, ArtistUnicode, 
-            Creator, BeatmapSetID, BackgroundFilename, AudioFilename
+            SELECT MAX(CASE
+                       WHEN BeatmapSetID IS NOT NULL AND BeatmapSetID <> -1 THEN mainID
+                       WHEN BeatmapSetID IS NULL THEN -1
+                       ELSE NULL
+            END) AS max_mainID,
+                groupID, Title, TitleUnicode, Artist, ArtistUnicode, 
+                Creator, BeatmapSetID, BackgroundFilename, AudioFilename
             FROM beatmaps
-                WHERE
-                    (BeatmapSetID IS NOT NULL AND BeatmapSetID <> -1)
+            WHERE HideSong = FALSE
+            GROUP BY groupID
             """
     return query
 
@@ -185,7 +190,7 @@ def query_beatmap(user_query: str, sort_by: str) -> Error:
     
     query = (_get_query_top()
                 + """
-                    AND (
+                    HAVING (
                         COALESCE(Title, '') || ' ' ||
                         COALESCE(TitleUnicode, '') || ' ' ||
                         COALESCE(Artist, '') || ' ' ||

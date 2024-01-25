@@ -16,9 +16,9 @@ from music_player.controller import test
 
 def display_songs(song_list):
     index = 0
-    print("Title\t TitleUnicode\t Artist\t ArtistUnicode\t Mapper\t BeatmapSetID")
+    print("ID\t Group\t Title\t TitleUnicode\t Artist\t ArtistUnicode\t Mapper\t BeatmapSetID")
     for row in song_list:
-        print(f"{row[0]}\t {row[1]}\t {row[2]}\t {row[3]}\t {row[4]}\t {row[5]}")
+        print(f"{row[0]}\t {row[1]}\t {row[2]}\t {row[3]}\t {row[4]}\t {row[5]}\t {row[6]}\t {row[7]}")
         index += 1
         if index == 50:
             break
@@ -33,7 +33,8 @@ def main():
         create_db()
         songs_directory = settings.OSU_FOLDER
         scanner(songs_directory)   # TODO: handle error
-    data = query_beatmap("nakuru", "Title")
+    data = default_select("title")
+    #data = query_beatmap("nakuru", "Title")
     display_songs(data)
     test()
 
